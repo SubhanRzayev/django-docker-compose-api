@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  nginx:
+    build: ./nginx
+    ports:
+      - 80:80
+    depends_on:
+      - web
+    volumes:
+      - ./static/:/code/static/
+      - ./media/:/code/media/
+
+
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdb:/var/lib/postgresql/data
+    env_file: ./.env
+
+
+  web:
+    build: .
+    restart: "always"
+    command: gunicorn --bind 0.0.0.0 -p 8000 Blog.wsgi
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+      
+    depends_on:
+      - db
+    env_file: ./.env
+
+    environment:
+      - VIRTUAL_HOST=localhost,ec2-3-90-164-67.compute-1.amazonaws.com
+      - VIRTUAL_PORT=8000
+      - HTTP_PORT=8000
+
+  
+
+
+    
+
+ 
+    
+
+
+  
